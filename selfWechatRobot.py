@@ -1,5 +1,5 @@
-__author__ = 'WYK'
 #coding=utf8
+__author__ = 'WYK'
 
 import os
 import time
@@ -17,12 +17,14 @@ KEY = 'f26276bebeba492ab763e83e89c511d0'
 
 auto_rep = True
 no_auto_rep_list = []
-time_interval = False
+time_interval = True
 
 class LOG:
     def __init__(self):
 
         self.LOG_HOME = r'D:\log\wxRobotLog'
+        if not os.path.exists(self.LOG_HOME):
+            os.makedirs(self.LOG_HOME)
         logging.basicConfig(level=logging.DEBUG,
             format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
             datefmt='%a, %d %b %Y %H:%M:%S',
@@ -82,6 +84,8 @@ def ctl_msg(msg):
         elif ctrl == 'close':
             time_interval = False
             itchat.send(u'延时回复已关闭', 'filehelper')
+    elif msg['Text'] == 'auther':
+        itchat.send(u'wechat-robot auther:君莫思归', 'filehelper')
     return True
 
 def get_response(msg, userid = 'wechat-robot'):
@@ -134,8 +138,16 @@ def tuling_reply(msg):
     else:
         return reply or defaultReply
 
-# 为了让实验过程更加方便（修改程序不用多次扫码），我们使用热启动
-itchat.auto_login(hotReload=True)
-# print itchat.get_chatrooms(update=True)
-itchat.run()
+def main():
+    # 为了让实验过程更加方便（修改程序不用多次扫码），我们使用热启动
+    itchat.auto_login(hotReload=True)
+    # print itchat.get_chatrooms(update=True)
+    itchat.run()
+
+try:
+    main()
+    print 'end!!!!!'
+except Exception as e:
+    print str(e)
+    os.system('pause')
 
