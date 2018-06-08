@@ -124,8 +124,8 @@ def tuling_reply(msg):
     # a or b的意思是，如果a有内容，那么返回a，否则返回b
     # 有内容一般就是指非空或者非None，你可以用`if a: print('True')`来测试
     logger.set_file(to_user_nickname)
-    logger.log(to_user_nickname + ':' + msg['Text'])
-    logger.log('rep:' + reply if reply else defaultReply)
+    logger.log('%s:%s' % (to_user_nickname, msg['Text']))
+    logger.log('rep:%s' % reply if reply else defaultReply)
 
     if time_interval:
         sec = min(len(reply or defaultReply), 50)
