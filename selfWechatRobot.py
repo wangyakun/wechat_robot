@@ -7,6 +7,8 @@ import logging
 import requests
 import itchat
 import threading
+import datetime
+import random
 
 import sys
 reload(sys)
@@ -18,6 +20,9 @@ KEY = 'f26276bebeba492ab763e83e89c511d0'
 auto_rep = True
 no_auto_rep_list = []
 time_interval = True
+append_disturb = True
+last_repl_time = datetime.datetime.now()
+pic_repl_list = [u'[发呆]', u'[呲牙]', u'[愉快]', u'[偷笑]', u'[憨笑]', u'[抠鼻]', u'[坏笑]', u'[阴险]', u'[嘿哈]', u'[奸笑]', u'[机智]']
 
 class LOG:
     def __init__(self):
@@ -67,6 +72,10 @@ def ctl_msg(msg):
     elif msg['Text'] == 'close':
         auto_rep = False
         itchat.send(u'机器人已关闭', 'filehelper')
+    elif msg['Text'].startswith('closelist '):
+        close_list = msg['Text'][11:].split(',')
+        no_auto_rep_list.extend(close_list)
+        itchat.send(u'机器人已对列表 %s 关闭' % close_list, 'filehelper')
     elif msg['Text'].startswith('close '):
         user = msg['Text'][6:]
         if user not in no_auto_rep_list:
@@ -84,6 +93,14 @@ def ctl_msg(msg):
         elif ctrl == 'close':
             time_interval = False
             itchat.send(u'延时回复已关闭', 'filehelper')
+    elif msg['Text'].startswith('disturb '):
+        ctrl = msg['Text'][8:]
+        if ctrl == 'open':
+            append_disturb = True
+            itchat.send(u'打扰模式已开启', 'filehelper')
+        elif ctrl == 'close':
+            append_disturb = False
+            itchat.send(u'打扰模式已关闭', 'filehelper')
     elif msg['Text'] == 'auther':
         itchat.send(u'wechat-robot auther:君莫思归', 'filehelper')
     return True
@@ -107,10 +124,23 @@ def get_response(msg, userid = 'wechat-robot'):
         # 将会返回一个None
         return
 
+@itchat.msg_register(itchat.content.PICTURE)
+def picture_reply(msg):
+    if time_interval:
+        sec = 2
+        print "recive image. sec", sec
+        def repl():
+            itchat.send(random.choice(pic_repl_list), msg['FromUserName'])
+            print "repled"
+        t = threading.Timer(sec, repl)
+        t.start()
+    else:
+        return random.choice(pic_repl_list)
+        
 # 这里是我们在“1. 实现微信消息的获取”中已经用到过的同样的注册方法
 @itchat.msg_register(itchat.content.TEXT)
 def tuling_reply(msg):
-    global logger, no_auto_rep_list
+    global logger, no_auto_rep_list, last_repl_time
     if ctl_msg(msg):
         return
     to_user_nickname = msg['User'].get('NickName', 'unknown')
@@ -130,6 +160,16 @@ def tuling_reply(msg):
     except Exception as e:
         print str(e)
         print "Exception ignored!!!!"
+        
+    last_repl_time = datetime.datetime.now()
+    if append_disturb:#todo:性能
+        sec = 600
+        def repl():
+            if append_disturb and last_repl_time + datetime.timedelta(minutes=9) < datetime.datetime.now():
+                itchat.send(u'怎么不说话了', msg['FromUserName'])
+                print "disturb %s" % msg['FromUserName']
+        t = threading.Timer(sec, repl)
+        t.start()
 
     if time_interval:
         sec = min(len(reply or defaultReply), 50)
