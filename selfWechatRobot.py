@@ -137,6 +137,19 @@ def get_response(msg, userid = 'wechat-robot'):
     except:
         # 将会返回一个None
         return
+        
+@itchat.msg_register(itchat.content.RECORDING)
+def voice_reply(msg):
+    if time_interval:
+        sec = 6
+        print "recive voice. sec", sec
+        def repl():
+            itchat.send(u'手机听筒坏了，听不到语音', msg['FromUserName'])
+            print "repled"
+        t = threading.Timer(sec, repl)
+        t.start()
+    else:
+        return u'手机听筒坏了，听不到语音'
 
 @itchat.msg_register(itchat.content.PICTURE)
 def picture_reply(msg):
