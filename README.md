@@ -20,12 +20,18 @@
   
   (3)打开/关闭延时回复
   
+  (4)打开/关闭打扰模式
+  
 控制台操作：
 向 文件传输助手 发送：
 
 “delay close” 关闭延时回复
 
 “delay open” 打开延时回复
+
+“disturb close” 关闭打扰模式
+
+“disturb open” 打开打扰模式
 
 “close” 关闭机器人
 
@@ -36,5 +42,7 @@
 “open XXX” 针对XXX打开自动回复
 
 “list” 查看屏蔽列表
+
+“closelist XXX,XXX,XXX” 对多人屏蔽自动回复
 
 “auther” 作者信息

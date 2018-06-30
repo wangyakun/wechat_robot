@@ -14,6 +14,18 @@ import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 
+help_info = '''“delay close” 关闭延时回复
+“delay open” 打开延时回复
+“disturb close” 关闭打扰模式
+“disturb open” 打开打扰模式
+“close” 关闭机器人
+“open” 打开机器人
+“close XXX” 针对XXX屏蔽自动回复
+“open XXX” 针对XXX打开自动回复
+“list” 查看屏蔽列表
+“closelist XXX,XXX,XXX” 对多人屏蔽自动回复
+“auther” 作者信息'''
+
 # KEY = '8edce3ce905a4c1dbb965e6b35c3834d'
 KEY = 'f26276bebeba492ab763e83e89c511d0'
 
@@ -103,6 +115,8 @@ def ctl_msg(msg):
             itchat.send(u'打扰模式已关闭', 'filehelper')
     elif msg['Text'] == 'auther':
         itchat.send(u'wechat-robot auther:君莫思归', 'filehelper')
+    elif msg['Text'] == 'help':
+        itchat.send(help_info, 'filehelper')
     return True
 
 def get_response(msg, userid = 'wechat-robot'):
