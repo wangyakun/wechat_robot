@@ -9,6 +9,7 @@ import itchat
 import threading
 import datetime
 import random
+import traceback
 
 import sys
 reload(sys)
@@ -29,6 +30,7 @@ help_info = '''“delay close” 关闭延时回复
 # KEY = '8edce3ce905a4c1dbb965e6b35c3834d'
 KEY = 'f26276bebeba492ab763e83e89c511d0'
 
+record_log = True
 auto_rep = True
 no_auto_rep_list = []
 time_interval = True
@@ -53,6 +55,8 @@ class LOG:
         self.user = user
 
     def log(self, message):
+        if not record_log:
+            return
         now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         print now
         print message
@@ -66,7 +70,7 @@ class LOG:
 logger = LOG()
 
 def ctl_msg(msg):
-    global auto_rep, no_auto_rep_list, time_interval
+    global auto_rep, no_auto_rep_list, time_interval, append_disturb, record_log
     if msg['ToUserName'] != 'filehelper':
         return False
     print '!!!this is admin!!!'
@@ -113,6 +117,14 @@ def ctl_msg(msg):
         elif ctrl == 'close':
             append_disturb = False
             itchat.send(u'打扰模式已关闭', 'filehelper')
+    elif msg['Text'].startswith('log '):
+        ctrl = msg['Text'][4:]
+        if ctrl == 'open':
+            record_log = True
+            itchat.send(u'后台记录日志已开启', 'filehelper')
+        elif ctrl == 'close':
+            record_log = False
+            itchat.send(u'后台记录日志已关闭', 'filehelper')
     elif msg['Text'] == 'auther':
         itchat.send(u'wechat-robot auther:君莫思归', 'filehelper')
     elif msg['Text'] == 'help':
@@ -140,6 +152,9 @@ def get_response(msg, userid = 'wechat-robot'):
         
 @itchat.msg_register(itchat.content.RECORDING)
 def voice_reply(msg):
+    to_user_nickname = msg['User'].get('NickName', 'unknown')
+    if not auto_rep or (to_user_nickname != 'unknown' and to_user_nickname in no_auto_rep_list):
+        return
     if time_interval:
         sec = 6
         print "recive voice. sec", sec
@@ -215,10 +230,14 @@ def main():
     # print itchat.get_chatrooms(update=True)
     itchat.run()
 
-try:
-    main()
-    print 'end!!!!!'
-except Exception as e:
-    print str(e)
-    os.system('pause')
+if __name__ == '__main__':
+    while True:
+        try:
+            main()
+            print 'end!!!!!'
+        except Exception as e:
+            print str(e)
+            print traceback.format_exc()
+            time.sleep(5)
+        print '!!!!!!restart!!!!!!!!'
 
