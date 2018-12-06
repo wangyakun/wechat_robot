@@ -40,8 +40,8 @@ pic_repl_list = [u'[发呆]', u'[呲牙]', u'[愉快]', u'[偷笑]', u'[憨笑]'
 
 class LOG:
     def __init__(self):
-
         self.LOG_HOME = r'D:\log\wxRobotLog'
+        self.NO_AUTO_REP_LIST = r'D:\log\noAutoRepList'
         if not os.path.exists(self.LOG_HOME):
             os.makedirs(self.LOG_HOME)
         logging.basicConfig(level=logging.DEBUG,
@@ -67,6 +67,19 @@ class LOG:
             f.write(message)
             f.write('\n')
 
+    def save_no_auto_rep_list(self):
+        global no_auto_rep_list
+        no_auto_rep_list = list(set(no_auto_rep_list))
+        with open(self.NO_AUTO_REP_LIST, 'w') as f:
+            f.write(str(no_auto_rep_list))
+
+    def load_no_auto_rep_list(self):
+        global no_auto_rep_list
+        if not os.path.exists(self.NO_AUTO_REP_LIST):
+            return False
+        with open(self.NO_AUTO_REP_LIST, 'r') as f:
+            no_auto_rep_list = list(f.read())
+
 logger = LOG()
 
 def ctl_msg(msg):
@@ -91,15 +104,17 @@ def ctl_msg(msg):
     elif msg['Text'].startswith('closelist '):
         close_list = msg['Text'][11:].split(',')
         no_auto_rep_list.extend(close_list)
+        logger.save_no_auto_rep_list()
         itchat.send(u'机器人已对列表 %s 关闭' % close_list, 'filehelper')
     elif msg['Text'].startswith('close '):
         user = msg['Text'][6:]
         if user not in no_auto_rep_list:
             no_auto_rep_list.append(user)
+            logger.save_no_auto_rep_list()
         itchat.send(u'机器人已对 %s 关闭' % user, 'filehelper')
     elif msg['Text'] == 'list':
         print no_auto_rep_list
-        itchat.send('已关闭列表：', 'filehelper')
+        itchat.send(u'已关闭列表：', 'filehelper')
         itchat.send(','.join(no_auto_rep_list), 'filehelper')
     elif msg['Text'].startswith('delay '):
         ctrl = msg['Text'][6:]
@@ -226,11 +241,12 @@ def tuling_reply(msg):
 
 def main():
     # 为了让实验过程更加方便（修改程序不用多次扫码），我们使用热启动
-    itchat.auto_login(hotReload=True)
+    itchat.auto_login(hotReload=True, enableCmdQR=True)
     # print itchat.get_chatrooms(update=True)
     itchat.run()
 
 if __name__ == '__main__':
+    logger.load_no_auto_rep_list()
     while True:
         try:
             main()
