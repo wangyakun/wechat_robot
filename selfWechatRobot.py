@@ -241,7 +241,8 @@ def tuling_reply(msg):
 
 def main():
     # 为了让实验过程更加方便（修改程序不用多次扫码），我们使用热启动
-    itchat.auto_login(hotReload=True, enableCmdQR=True)
+    #itchat.auto_login(hotReload=True, enableCmdQR=True)
+    itchat.auto_login(hotReload=True, enableCmdQR=False)
     # print itchat.get_chatrooms(update=True)
     itchat.run()
 
