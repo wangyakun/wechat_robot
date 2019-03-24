@@ -52,3 +52,23 @@
 “closelist XXX,XXX,XXX” 对多人屏蔽自动回复
 
 “auther” 作者信息
+
+
+
+微信自动回复机器人-后台
+
+
+使用方法：
+
+0.(os.system里面是本人树莓派目录，不同环境请自行改动)
+
+1.python wechatRobot_bakend.py
+
+2.微信扫二维码登录
+
+控制台操作：
+向 文件传输助手 发送：
+
+“new” 新登录-微信自动回复机器人
+
+“auther” 作者信息
